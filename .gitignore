@@ -1,0 +1,6 @@
+devel
+build
+*pyc
+logs
+rospy
+.catkin_tools

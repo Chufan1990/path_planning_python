@@ -1,19 +1,19 @@
-import numpy as np
-import random
-from hmi_publisher import *
+#!/usr/bin/env python
+import rospy
+from rrt_interface import RRTInterface
 
 
-def way_point_generator():
-    rospy.init_node('way_point_generator', anonymous=True)
-    rate = rospy.Rate(10)
-    while not rospy.is_shutdown():
-        rand = random.random()
-        yield zip(np.linspace(rand, rand+100, 100), np.linspace(rand, rand+100, 100),np.linspace(rand, rand+100, 100))
-        # yield zip([[1,100],[200,1000]],[[1,100],[200,1000]])
-        rate.sleep()
+def test():
+    rospy.init_node('test', anonymous=True)
+    rospy.loginfo("ros init done")
+    rrt_problem = RRTInterface()
+    rospy.loginfo("Interface init done")
+    rrt_problem.update()
+    # rrt_problem.test()
 
-if __name__  =="__main__":
-    a = WayPointVisualizer()
-    for i in way_point_generator():
-        a.plot_node_new(i,0)
-        
+
+if __name__ == "__main__":
+    try:
+        test()
+    except rospy.ROSInterruptException:
+        pass
