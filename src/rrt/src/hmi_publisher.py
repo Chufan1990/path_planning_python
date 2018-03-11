@@ -20,6 +20,8 @@ class RRTVisualizer:
             '/path_planning/viz/boundary', Marker, queue_size=1)
         self.pub_points = rospy.Publisher(
             '/path_planning/viz/points', Marker, queue_size=1)
+        self.pub_path_optimized = rospy.Publisher(
+            '/path_planning/viz/path_optimized', Marker, queue_size=1)
 
     def plot_tree(self, polygon):
         # rospy.loginfo("polygon: {}".format(polygon))
@@ -166,3 +168,31 @@ class RRTVisualizer:
             p.z = z
             marker.points.append(p)
         self.pub_points.publish(marker)
+    
+    def plot_path_optimized(self, polygon):
+        marker = Marker()
+        marker.header.frame_id = 'world'
+        marker.header.stamp = rospy.Time.now()
+        marker.ns = "path_planning"
+        marker.action = Marker.ADD
+        marker.lifetime = rospy.Duration(20)
+        marker.type = Marker.LINE_STRIP
+        marker.id = 0
+        marker.scale.x = 1
+        marker.scale.y = 1
+        marker.scale.z = 1
+        marker.color.r = 155/255.0
+        marker.color.g = 255/255.0
+        marker.color.b = 155/255.0
+        marker.color.a = 1.0
+        marker.pose.orientation.x = 0
+        marker.pose.orientation.y = 0
+        marker.pose.orientation.z = 0
+        marker.pose.orientation.w = 1
+        for point in polygon.points:
+            p = Point()
+            p.x = point.x
+            p.y = point.y
+            p.z = point.z
+            marker.points.append(point)
+        self.pub_path_optimized.publish(marker)

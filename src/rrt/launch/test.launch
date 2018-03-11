@@ -1,15 +1,17 @@
 <launch>
 		<!-- <group ns="path_planning"> -->
 				<arg name="path_planning_rrt_epsilion" default="30" />
-				<arg name="path_planning_rrt_radius" default="20" />
-				<arg name="path_planning_rrt_node_num" default="5000" />
-				<arg name="path_planning_rrt_level" default="4" />
+				<arg name="path_planning_rrt_radius" default="100" />
+				<arg name="path_planning_rrt_node_num" default="50000" />
+				<arg name="path_planning_rrt_level" default="2" />
+				<arg name="path_planning_rrt_rate" default="10" />
 				
 				<node pkg="rrt" type="test.py" name="rrt" output="screen">
 						<param name="epsilon" type="double" value="$(arg path_planning_rrt_epsilion)" />
 						<param name="radius" type="double" value="$(arg path_planning_rrt_radius)" />
 						<param name="node_num" type="double" value="$(arg path_planning_rrt_node_num)" />
 						<param name="level" type="double" value="$(arg path_planning_rrt_level)" />
+						<param name="rate" type="int" value="$(arg path_planning_rrt_rate)" />
 				</node>
 		<!-- </group> -->
 </launch>

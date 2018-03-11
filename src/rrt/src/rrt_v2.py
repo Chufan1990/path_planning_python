@@ -5,10 +5,11 @@ import math
 import numpy as np
 from util import dist, atan2, sin, cos, random, Node
 from geometry_msgs.msg import Polygon, Point32
+from smoother import RRTSmoother
 
 
 class RapidExpandRandomTree:
-    def __init__(self, node_start, node_goal, pose_start_set, pose_goal_set, obstacles, x_dim, y_dim, RADIUS, EPSILON, NUMMODES):
+    def __init__(self, node_start, node_goal, pose_start_set, pose_goal_set, obstacles, x_dim, y_dim, RADIUS, EPSILON, NUMMODES, RATE):
         self.state = 'init'
         self.pose_start_set = pose_start_set
         self.pose_goal_set = pose_goal_set
@@ -20,6 +21,7 @@ class RapidExpandRandomTree:
 
         self.obstacles = obstacles
         self.nodes = []
+        self.node_last = Node(None, None)
 
         self.RADIUS = RADIUS
         self.EPSILON = EPSILON
@@ -29,7 +31,8 @@ class RapidExpandRandomTree:
             '/path_planning/rrt/tree', Polygon, queue_size=100)
         self.pub_path = rospy.Publisher(
             '/path_planning/rrt/path', Polygon, queue_size=100)
-        self.rate = rospy.Rate(10)
+        self.pub_path_optimized = rospy.Publisher('/path_planning/rrt/path_optimized', Polygon, queue_size =1)
+        self.rate = rospy.Rate(int(RATE))
         # self.rate_path = rospy.Rate(1)
 
     def update(self):
@@ -43,11 +46,12 @@ class RapidExpandRandomTree:
                     self.state = 'build tree'
             elif self.state == 'build tree':
                 rospy.loginfo("state is {}".format(self.state))
-                self.state, self.nodes = self.build_tree()
-            elif self.state == 'complete':
+                self.state, self.node_last = self.build_tree()
+            elif self.state == 'completed':
                 rospy.loginfo("state is {}".format(self.state))
-                node_current = self.nodes[-1]
+                node_current = self.node_last
                 path = []
+                self.nodes = [node_current]
                 while node_current.parent != None:
                     # pose_current = Point32(
                     #     node_current.point[0], node_current.point[1], 0.0)
@@ -57,7 +61,21 @@ class RapidExpandRandomTree:
                     # path.append(pose_current)
                     self.pub_path.publish(Polygon(path))
                     node_current = node_current.parent
+                    self.nodes.append(node_current)
                     self.rate.sleep()
+                self.state = "test"
+            elif self.state == 'test':
+                rospy.loginfo("state is {}".format(self.state))
+                for node in self.nodes:
+                    rospy.loginfo("{} ".format(node.point))
+                self.state = 'optimization'
+            elif self.state == 'optimization':
+                # path_optimized = []
+                rospy.loginfo("state is {}".format(self.state))
+                path_smoother = RRTSmoother(self.nodes, self.obstacles)
+                # path_smoother.test()
+                path_optimized, __ = path_smoother.update()
+                self.pub_path_optimized.publish(Polygon(path_optimized))
                 self.state = 'done'
             elif self.state == 'incomplete':
                 rospy.loginfo("state is {}".format(self.state))
@@ -74,7 +92,7 @@ class RapidExpandRandomTree:
         nodes = self.nodes[:]
         node_goal = self.node_goal
         state = self.state
-        while count < self.NUMMODES and state != 'complete':
+        while count < self.NUMMODES and state != 'completed':
             node_new = self.get_next_node(nodes)
             count += 1
             point_new = Point32(node_new.point[0], node_new.point[1], 0.0)
@@ -84,14 +102,14 @@ class RapidExpandRandomTree:
             tree.append(point_parent)
             tree.append(point_new)
             self.pub_tree.publish(Polygon(tree))
-            state = self.reach_goal(node_new, node_goal, state)
+            state, node_last = self.reach_goal(node_new, node_goal, state)
             self.rate.sleep()
-        return state, nodes
+        return state, node_last
 
     def reach_goal(self, node_new, node_goal, state):
         if dist(node_new, node_goal) <= self.RADIUS:
-            state = 'complete'
-        return state
+            state = 'completed'
+        return state, node_new
 
     def get_random(self):
         return [random.random()*self.x_dim, random.random()*self.y_dim]

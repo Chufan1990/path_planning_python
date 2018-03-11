@@ -31,10 +31,11 @@ class RRTInterface(object):
         self.boundary = []
 
         # get const parameters
-        self.EPSILON = rospy.get_param('~epsilion', 10)
+        self.EPSILON = rospy.get_param('~epsilon', 10)
         self.RADIUS = rospy.get_param('~radius', 1)
         self.NUMMODES = rospy.get_param('~node_num', 5000)
         self.LEVEL = rospy.get_param('~level', 1)
+        self.RATE = rospy.get_param('~rate', 10)
 
         # set solver
         self.state = 'init'
@@ -53,6 +54,8 @@ class RRTInterface(object):
         self.sub_path = rospy.Subscriber(
             '/path_planning/rrt/path', Polygon, self.path_visualizer)
         # set hmi_publisher
+        self.sub_path_optimized = rospy.Subscriber(
+            "/path_planning/rrt/path_optimized", Polygon, self.path_optimized_visualizer)
         self.hmi_publisher = RRTVisualizer()
 
         # initialization
@@ -105,7 +108,7 @@ class RRTInterface(object):
 
     def update(self):
         rrt_solver = RapidExpandRandomTree(
-            self.node_start, self.node_goal, self.pose_start_set, self.pose_goal_set, self.obstacles, self.x_dim, self.y_dim, self.RADIUS, self.EPSILON, self.NUMMODES)
+            self.node_start, self.node_goal, self.pose_start_set, self.pose_goal_set, self.obstacles, self.x_dim, self.y_dim, self.RADIUS, self.EPSILON, self.NUMMODES, self.RATE)
         rrt_solver.update()
         # TODO: pass node_new/tree/boundary/obstacles to hmi
 
@@ -121,6 +124,15 @@ class RRTInterface(object):
     def path_visualizer(self, data):
         # rospy.loginfo("path_visualizer working correct")
         self.hmi_publisher.plot_path(data)
+        self.hmi_publisher.plot_boundary(
+            self.boundary_for_visualization(self.boundary), 0.0)
+        self.hmi_publisher.plot_obstacles(
+            self.obstacles_for_visualization(self.obstacles), 0.0)
+        self.hmi_publisher.plot_points(self.points_visualizer(), 0.0)
+
+    def path_optimized_visualizer(self, data):
+        # rospy.loginfo("{}".format(type(data)))
+        self.hmi_publisher.plot_path_optimized(data)
         self.hmi_publisher.plot_boundary(
             self.boundary_for_visualization(self.boundary), 0.0)
         self.hmi_publisher.plot_obstacles(
@@ -147,5 +159,5 @@ class RRTInterface(object):
 
     def test(self):
         rrt_solver = RapidExpandRandomTree(self.node_start, self.node_goal, self.pose_start_set, self.pose_goal_set,
-                                           self.obstacles, self.x_dim, self.y_dim, self.RADIUS, self.EPSILON, self.NUMMODES)
+                                           self.obstacles, self.x_dim, self.y_dim, self.RADIUS, self.EPSILON, self.NUMMODES, self.RATE)
         rrt_solver.test()

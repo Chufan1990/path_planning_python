@@ -1,41 +1,55 @@
 import rospy
 import numpy as np
 from util import dist, Node
+from geometry_msgs.msg import Point32
 
 
 class RRTSmoother(object):
-    def __init__(self, path, obstacles):
+    def __init__(self, nodes, obstacles):
         super(RRTSmoother, self).__init__()
-        self.path = path[:]
-        self.obstacles = obstacles[:]
+        self.nodes = nodes
+        self.obstacles = obstacles
+        self.rate = rospy.Rate(0.1)
+        # rospy.loginfo("{} ".format(self.nodes[0].point))
 
     def update(self):
-        node_choose = self.path[0]
-        path_optimized = [self.path[0]]
+        node_choose = self.nodes[0]
+        path_optimized = [Point32(self.nodes[0].point[0], self.nodes[0].point[1], 0.0)]
+        node_optimized = [self.nodes[0]]
         while node_choose.parent != None:
             node_nearest = self.path_smoother(node_choose)
             if node_nearest != None:
-                node_next = Node(node_nearest.point, node_choose)
+                node_next = Node(node_choose.point, node_nearest)
                 node_choose = node_nearest
-                path_optimized.append(node_next)
+                # path_optimized.append(node_next.point)
+                # node_optimized.append(node_next)
+                # rospy.loginfo("================")
             else:
                 node_choose = node_choose.parent
                 node_next = node_choose
-            path_optimized.append(node_next)
-        return path_optimized
+                # rospy.loginfo("----------------")
+            point_next = Point32(node_next.point[0], node_next.point[1], 0.0)
+            # rospy.loginfo("{} ".format(point_next))
+            path_optimized.append(point_next)
+            node_optimized.append(node_next)
+            self.rate.sleep()
+        path_optimized.append(Point32(self.nodes[-1].point[0], self.nodes[-1].point[1], 0.0))
+        return path_optimized, node_optimized
 
     def path_smoother(self, node_choose):
         node_nearest = None
-        for node in self.path[:]:
+        for node in reversed(self.nodes):
+            # rospy.loginfo("{}".format(type(node)))
             if self.path_collides(node, node_choose) == False:
-                if dist(node, node_choose) < self.path_distance_calculator(node, node_choose):
+                # rospy.loginfo("distance {}".format(self.path_distance_calculator(node, node_choose)))
+                if dist(node, node_choose) <= self.path_distance_calculator(node, node_choose):
                     node_nearest = node
-                    # node_choose = node
+                    break
         return node_nearest
 
     def path_distance_calculator(self, node, node_choose):
-        if dist(node.parent, node_choose) != 0:
-            return dist(node, self.path_distance_calculator(node.parent, node_choose))
+        if node_choose.parent != None and dist(node, node_choose) != 0:
+            return dist(node_choose, node_choose.parent) + self.path_distance_calculator(node, node_choose.parent)
         else:
             return 0
 
@@ -54,3 +68,10 @@ class RRTSmoother(object):
                 if obs.is_in_obstacle(p) == True:
                     return True
         return False
+
+    def test(self):
+        for node in self.nodes:
+            rospy.loginfo("distance1 {}".format(self.path_distance_calculator(node, self.nodes[0])))
+            rospy.loginfo("distance2 {}".format(dist(node, self.nodes[0])))
+
+
