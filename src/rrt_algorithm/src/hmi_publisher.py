@@ -23,7 +23,7 @@ class RRTVisualizer:
 
     def plot_tree(self, polygon):
         marker = Marker()
-        marker.header.frame_id = 'world'
+        marker.header.frame_id = 'path_planning'
         marker.header.stamp = rospy.Time.now()
         marker.ns = "path_planning"
         marker.action = Marker.ADD
@@ -51,7 +51,7 @@ class RRTVisualizer:
 
     def plot_path(self, polygon):
         marker = Marker()
-        marker.header.frame_id = 'world'
+        marker.header.frame_id = 'path_planning'
         marker.header.stamp = rospy.Time.now()
         marker.ns = "path_planning"
         marker.action = Marker.ADD
@@ -80,7 +80,7 @@ class RRTVisualizer:
 
     def plot_obstacles(self, obstacles, z):
         marker = Marker()
-        marker.header.frame_id = 'world'
+        marker.header.frame_id = 'path_planning'
         marker.header.stamp = rospy.Time.now()
         marker.ns = "path_planning"
         marker.action = Marker.ADD
@@ -108,7 +108,7 @@ class RRTVisualizer:
 
     def plot_boundary(self, boundary, z):
         marker = Marker()
-        marker.header.frame_id = 'world'
+        marker.header.frame_id = 'path_planning'
         marker.header.stamp = rospy.Time.now()
         marker.ns = "path_planning"
         marker.action = Marker.ADD
@@ -137,7 +137,7 @@ class RRTVisualizer:
     def plot_points(self, points, z):
         pts = points[:]
         marker = Marker()
-        marker.header.frame_id = 'world'
+        marker.header.frame_id = 'path_planning'
         marker.header.stamp = rospy.Time.now()
         marker.ns = "path_planning"
         marker.action = Marker.ADD
@@ -165,7 +165,7 @@ class RRTVisualizer:
     
     def plot_path_optimized(self, polygon):
         marker = Marker()
-        marker.header.frame_id = 'world'
+        marker.header.frame_id = 'path_planning'
         marker.header.stamp = rospy.Time.now()
         marker.ns = "path_planning"
         marker.action = Marker.ADD

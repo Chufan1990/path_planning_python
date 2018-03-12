@@ -13,8 +13,8 @@ test.py
 
 RVIZ parameters: 
 
-Frame_id = "/path_planning" 
-marker_topic = "path_planning/rrt" 
+Frame_id = "path_planning" 
+marker_topic = "path_planning/viz" 
 Instructions: 
 
 Open terminal and type 
@@ -26,6 +26,6 @@ $roslaunch rrt test.launch
 open new terminal 
 $rviz
 In the RVIZ window, change: 
-fixed frame under global option to "world" 
-add a marker and change marker topic to "path_planner_rrt" 
+fixed frame under global option to "path_planning" 
+add a marker and change marker topic to "path_planning/viz" 
 The environment and the path will be visualized in RVIZ. 
