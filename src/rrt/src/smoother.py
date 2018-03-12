@@ -5,31 +5,26 @@ from geometry_msgs.msg import Point32
 
 
 class RRTSmoother(object):
-    def __init__(self, nodes, obstacles):
+    def __init__(self, nodes, obstacles, RATE):
         super(RRTSmoother, self).__init__()
         self.nodes = nodes
         self.obstacles = obstacles
-        self.rate = rospy.Rate(0.1)
-        # rospy.loginfo("{} ".format(self.nodes[0].point))
+        self.rate = rospy.Rate(int(RATE))
 
     def update(self):
         node_choose = self.nodes[0]
         path_optimized = [Point32(self.nodes[0].point[0], self.nodes[0].point[1], 0.0)]
+        path_optimized  = []
         node_optimized = [self.nodes[0]]
         while node_choose.parent != None:
             node_nearest = self.path_smoother(node_choose)
             if node_nearest != None:
                 node_next = Node(node_choose.point, node_nearest)
                 node_choose = node_nearest
-                # path_optimized.append(node_next.point)
-                # node_optimized.append(node_next)
-                # rospy.loginfo("================")
             else:
                 node_choose = node_choose.parent
                 node_next = node_choose
-                # rospy.loginfo("----------------")
             point_next = Point32(node_next.point[0], node_next.point[1], 0.0)
-            # rospy.loginfo("{} ".format(point_next))
             path_optimized.append(point_next)
             node_optimized.append(node_next)
             self.rate.sleep()
@@ -38,10 +33,9 @@ class RRTSmoother(object):
 
     def path_smoother(self, node_choose):
         node_nearest = None
-        for node in reversed(self.nodes):
-            # rospy.loginfo("{}".format(type(node)))
+        nodes = self.nodes[:]
+        for node in reversed(nodes):
             if self.path_collides(node, node_choose) == False:
-                # rospy.loginfo("distance {}".format(self.path_distance_calculator(node, node_choose)))
                 if dist(node, node_choose) <= self.path_distance_calculator(node, node_choose):
                     node_nearest = node
                     break

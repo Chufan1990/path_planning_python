@@ -8,8 +8,6 @@ from visualization_msgs.msg import Marker, MarkerArray
 
 class RRTVisualizer:
     def __init__(self):
-        # self.sub_way_point = rospy.Subscriber()
-
         self.pub_tree = rospy.Publisher(
             '/path_planning/viz/tree', Marker, queue_size=1)
         self.pub_path = rospy.Publisher(
@@ -24,7 +22,6 @@ class RRTVisualizer:
             '/path_planning/viz/path_optimized', Marker, queue_size=1)
 
     def plot_tree(self, polygon):
-        # rospy.loginfo("polygon: {}".format(polygon))
         marker = Marker()
         marker.header.frame_id = 'world'
         marker.header.stamp = rospy.Time.now()
@@ -82,7 +79,6 @@ class RRTVisualizer:
         self.pub_path.publish(marker)
 
     def plot_obstacles(self, obstacles, z):
-        # rospy.loginfo("obstacles: {}".format(type(obstacles)))
         marker = Marker()
         marker.header.frame_id = 'world'
         marker.header.stamp = rospy.Time.now()
@@ -111,7 +107,6 @@ class RRTVisualizer:
         self.pub_obstacles.publish(marker)
 
     def plot_boundary(self, boundary, z):
-        # rospy.loginfo("boundary: {}".format(type(boundary)))
         marker = Marker()
         marker.header.frame_id = 'world'
         marker.header.stamp = rospy.Time.now()
@@ -137,7 +132,6 @@ class RRTVisualizer:
             p.y = point[1]
             p.z = z
             marker.points.append(p)
-        # marker.points.append(marker.points[0])
         self.pub_boudary.publish(marker)
 
     def plot_points(self, points, z):
@@ -150,9 +144,9 @@ class RRTVisualizer:
         marker.lifetime = rospy.Duration(20)
         marker.type = Marker.SPHERE_LIST
         marker.id = 0
-        marker.scale.x = 20
-        marker.scale.y = 20
-        marker.scale.z = 20
+        marker.scale.x = 25
+        marker.scale.y = 25
+        marker.scale.z = 25
         marker.color.r = 10/255.0
         marker.color.g = 10/255.0
         marker.color.b = 255/255.0

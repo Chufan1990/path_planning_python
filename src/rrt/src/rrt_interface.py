@@ -66,7 +66,6 @@ class RRTInterface(object):
 
     def init_obstacles(self, config_num):
         obstacles = []
-        # print("config {}".format(config_num))
         if config_num >= 1:
             obstacles.append(MyPolygon(self.obstacle_one))
             rospy.loginfo("obstacle type: {}".format(type(self.obstacle_one)))
@@ -110,7 +109,6 @@ class RRTInterface(object):
         rrt_solver = RapidExpandRandomTree(
             self.node_start, self.node_goal, self.pose_start_set, self.pose_goal_set, self.obstacles, self.x_dim, self.y_dim, self.RADIUS, self.EPSILON, self.NUMMODES, self.RATE)
         rrt_solver.update()
-        # TODO: pass node_new/tree/boundary/obstacles to hmi
 
     def tree_visualizer(self, data):
         # rospy.loginfo("tree_visualizer working correct")
@@ -131,7 +129,6 @@ class RRTInterface(object):
         self.hmi_publisher.plot_points(self.points_visualizer(), 0.0)
 
     def path_optimized_visualizer(self, data):
-        # rospy.loginfo("{}".format(type(data)))
         self.hmi_publisher.plot_path_optimized(data)
         self.hmi_publisher.plot_boundary(
             self.boundary_for_visualization(self.boundary), 0.0)

@@ -26,14 +26,14 @@ class RapidExpandRandomTree:
         self.RADIUS = RADIUS
         self.EPSILON = EPSILON
         self.NUMMODES = NUMMODES
-
+        self.RATE = RATE
+        
         self.pub_tree = rospy.Publisher(
             '/path_planning/rrt/tree', Polygon, queue_size=100)
         self.pub_path = rospy.Publisher(
             '/path_planning/rrt/path', Polygon, queue_size=100)
         self.pub_path_optimized = rospy.Publisher('/path_planning/rrt/path_optimized', Polygon, queue_size =1)
         self.rate = rospy.Rate(int(RATE))
-        # self.rate_path = rospy.Rate(1)
 
     def update(self):
         while not rospy.is_shutdown():
@@ -53,12 +53,9 @@ class RapidExpandRandomTree:
                 path = []
                 self.nodes = [node_current]
                 while node_current.parent != None:
-                    # pose_current = Point32(
-                    #     node_current.point[0], node_current.point[1], 0.0)
                     pose_parrent = Point32(
                         node_current.parent.point[0], node_current.parent.point[1], 0.0)
                     path.append(pose_parrent)
-                    # path.append(pose_current)
                     self.pub_path.publish(Polygon(path))
                     node_current = node_current.parent
                     self.nodes.append(node_current)
@@ -70,9 +67,8 @@ class RapidExpandRandomTree:
                     rospy.loginfo("{} ".format(node.point))
                 self.state = 'optimization'
             elif self.state == 'optimization':
-                # path_optimized = []
                 rospy.loginfo("state is {}".format(self.state))
-                path_smoother = RRTSmoother(self.nodes, self.obstacles)
+                path_smoother = RRTSmoother(self.nodes, self.obstacles, self.RATE)
                 # path_smoother.test()
                 path_optimized, __ = path_smoother.update()
                 self.pub_path_optimized.publish(Polygon(path_optimized))
@@ -154,7 +150,6 @@ class RapidExpandRandomTree:
 
     def get_next_node(self, nodes):
         found_next = False
-        # point_test = None
         point_for_sure = None
         node_temp_nearest = None
         while found_next == False:
@@ -165,7 +160,6 @@ class RapidExpandRandomTree:
                     point_candidate, point_array = self.step_from_to(
                         node.point, point_rand)
                     if self.collides(point_array) == False:
-                        # point_test = point_rand
                         node_temp_nearest = node
                         point_for_sure = point_candidate
                         found_next = True
