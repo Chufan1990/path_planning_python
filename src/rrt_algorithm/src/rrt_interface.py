@@ -17,7 +17,7 @@ class RRTInterface(object):
         super(RRTInterface, self).__init__()
         rospack = rospkg.RosPack()
         data = yaml.load(
-            open(os.path.join(rospack.get_path('rrt'), 'config/test.yaml')))
+            open(os.path.join(rospack.get_path('rrt_algorithm'), 'config/env.yaml')))
 
         # set problem
         self.node_start = Node(None, None)
@@ -66,19 +66,16 @@ class RRTInterface(object):
 
     def init_obstacles(self, config_num):
         obstacles = []
+        rospy.loginfo("="*len("obstacle number: {}".format(int(config_num))))
+        rospy.loginfo("obstacle number: {}".format(int(config_num)))
         if config_num >= 1:
             obstacles.append(MyPolygon(self.obstacle_one))
-            rospy.loginfo("obstacle type: {}".format(type(self.obstacle_one)))
         if config_num >= 2:
             obstacles.append(MyPolygon(self.obstacle_two))
-            rospy.loginfo("obstacle type: {}".format(type(self.obstacle_two)))
         if config_num >= 3:
             obstacles.append(MyPolygon(self.obstacle_three))
-            rospy.loginfo("obstacle type: {}".format(
-                type(self.obstacle_three)))
         if config_num >= 4:
             obstacles.append(MyPolygon(self.obstacle_four))
-            rospy.loginfo("obstacle type: {}".format(type(self.obstacle_four)))
         self.obstacles = obstacles
 
     def init_point_goal(self, data):

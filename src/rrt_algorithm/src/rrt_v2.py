@@ -10,7 +10,7 @@ from smoother import RRTSmoother
 
 class RapidExpandRandomTree:
     def __init__(self, node_start, node_goal, pose_start_set, pose_goal_set, obstacles, x_dim, y_dim, RADIUS, EPSILON, NUMMODES, RATE):
-        self.state = 'init'
+        self.state = 'initializing'
         self.pose_start_set = pose_start_set
         self.pose_goal_set = pose_goal_set
         self.node_start = node_start
@@ -37,18 +37,21 @@ class RapidExpandRandomTree:
 
     def update(self):
         while not rospy.is_shutdown():
-            if self.state == 'init':
-                rospy.loginfo("state is {}".format(self.state))
+            if self.state == 'initializing':
+                rospy.loginfo("="*len("Current State:   {}".format(self.state)))
+                rospy.loginfo("Current State:   {}".format(self.state))
                 if self.pose_goal_set == False or self.pose_start_set == False or self.node_start == None or self.node_goal == None:
                     rospy.logwarn("Start or goal point not set yet")
                 else:
                     self.nodes = [self.node_start]
-                    self.state = 'build tree'
-            elif self.state == 'build tree':
-                rospy.loginfo("state is {}".format(self.state))
+                    self.state = 'building tree'
+            elif self.state == 'building tree':
+                rospy.loginfo("="*len("Current State:   {}".format(self.state)))
+                rospy.loginfo("Current State:   {}".format(self.state))
                 self.state, self.node_last = self.build_tree()
             elif self.state == 'completed':
-                rospy.loginfo("state is {}".format(self.state))
+                rospy.loginfo("="*len("Current State:   {}".format(self.state)))
+                rospy.loginfo("Current State:   {}".format(self.state))
                 node_current = self.node_last
                 path = []
                 self.nodes = [node_current]
@@ -60,22 +63,25 @@ class RapidExpandRandomTree:
                     node_current = node_current.parent
                     self.nodes.append(node_current)
                     self.rate.sleep()
-                self.state = "test"
-            elif self.state == 'test':
-                rospy.loginfo("state is {}".format(self.state))
+                self.state = "testing"
+            elif self.state == 'testing':
+                rospy.loginfo("="*len("Current State:   {}".format(self.state)))
+                rospy.loginfo("Current State:   {}".format(self.state))
                 for node in self.nodes:
                     rospy.loginfo("{} ".format(node.point))
-                self.state = 'optimization'
-            elif self.state == 'optimization':
-                rospy.loginfo("state is {}".format(self.state))
+                self.state = 'optimizating'
+            elif self.state == 'optimizating':
+                rospy.loginfo("="*len("Current State:   {}".format(self.state)))
+                rospy.loginfo("Current State:   {}".format(self.state))
                 path_smoother = RRTSmoother(self.nodes, self.obstacles, self.RATE)
                 # path_smoother.test()
                 path_optimized, __ = path_smoother.update()
                 self.pub_path_optimized.publish(Polygon(path_optimized))
-                self.state = 'done'
-            elif self.state == 'incomplete':
-                rospy.loginfo("state is {}".format(self.state))
-                rospy.loginfo("Cannot find path!")
+                self.state = 'Exiting'
+            elif self.state == 'incompleted':
+                rospy.loginfo("="*len("Current State:   {}".format(self.state)))
+                rospy.loginfo("Current State:   {}".format(self.state))
+                rospy.logwarn("Cannot find path!")
             else:
                 break
             self.rate.sleep()
@@ -88,7 +94,7 @@ class RapidExpandRandomTree:
         nodes = self.nodes[:]
         node_goal = self.node_goal
         state = self.state
-        while count < self.NUMMODES and state != 'completed':
+        while count < self.NUMMODES and not state == 'completed':
             node_new = self.get_next_node(nodes)
             count += 1
             point_new = Point32(node_new.point[0], node_new.point[1], 0.0)

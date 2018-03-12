@@ -3,10 +3,10 @@
 				<arg name="path_planning_rrt_epsilion" default="20" />
 				<arg name="path_planning_rrt_radius" default="20" />
 				<arg name="path_planning_rrt_node_num" default="50000" />
-				<arg name="path_planning_rrt_level" default="2" />
+				<arg name="path_planning_rrt_level" default="4" />
 				<arg name="path_planning_rrt_rate" default="10" />
 				
-				<node pkg="rrt" type="test.py" name="rrt" output="screen">
+				<node pkg="rrt_algorithm" type="test.py" name="rrt_algorithm" output="screen">
 						<param name="epsilon" type="double" value="$(arg path_planning_rrt_epsilion)" />
 						<param name="radius" type="double" value="$(arg path_planning_rrt_radius)" />
 						<param name="node_num" type="double" value="$(arg path_planning_rrt_node_num)" />
