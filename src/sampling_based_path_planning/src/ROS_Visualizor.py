@@ -4,7 +4,6 @@ from RRT_family_planners import Node
 import shapely.geometry
 from visualization_msgs.msg import Marker, MarkerArray
 import geometry_msgs.msg
-from path_planning_msgs.msg import Line, LineArray
 
 class RRTFamilyVisualizer:
 	def __init__(self):

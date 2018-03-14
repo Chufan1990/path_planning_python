@@ -1,7 +1,6 @@
 import rospy
 from RRT_family_planners import RRTFamilyPathPlanner
 from ROS_Visualizor import RRTFamilyVisualizer
-from path_planning_msgs.msg import Line, LineArray
 
 
 class SampleingBasedPathPlanner(object):

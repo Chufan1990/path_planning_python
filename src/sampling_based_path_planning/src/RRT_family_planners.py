@@ -5,7 +5,6 @@ import math
 import numpy as np
 import rospy
 from geometry_msgs.msg import Point32
-from path_planning_msgs.msg import Line, LineArray
 
 class RRTFamilyPathPlanner(object):
 
@@ -119,6 +118,7 @@ class RRTFamilyPathPlanner(object):
 		node_start = self.node_start
 		self.vertex.add(node_start)
 		for i in range(self.num_iteration):
+			rospy.loginfo("iteration: {}".format(i))
 			point_random = self.get_random_clean()
 			node_nearest = self.find_node_nearest(point_random)
 			point_new = self.steer(node_nearest.point, point_random)
@@ -168,10 +168,9 @@ class RRTFamilyPathPlanner(object):
 		path = list()
 		path_length_tmp = float("inf")
 		node_start = self.node_start
-		# node_goal = self.node_goal
 		self.vertex.add(node_start)
 		for i in range(self.num_iteration):
-			rospy.loginfo("counter: {}".format(i))
+			rospy.loginfo("iteration: {}".format(i))
 			point_random = self.get_random_clean()
 			node_nearest = self.find_node_nearest(point_random)
 			point_new = self.steer(node_nearest.point, point_random)
