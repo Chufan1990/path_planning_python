@@ -14,19 +14,19 @@ class SampleingBasedPathPlanner(object):
 
         Args:
                 environment 			(a yaml environment): 			Configuration space including obstacles.
-                bounds 					( (float float float float) ): 	x min, y min, x max and y max, coordinates fo the bounds of the configuration space.
-                pose_start				( (float float) ):  			Position of the initial point in configuration space, specified in problem.
-                pose_goal				( (float, float) ):				Position of the target point in configuration space, speciied in problem.
-                object_radius 			( float ):						Radius of objects.
-                steer_distance  		( float ):						Limit of the length of branch in tree.
-                num_iterations			( int ):						Max sample times for creating tree.
-                resolution				( int ):						Number of segments used to approximate a quarter circle arount point.
-                runForFullIterations	( boolean ):					If True RRT and RRTStar return the first path found without having to sample all num_iterations points. Default value = False.
-                RRT_Flavour				( string ):						String representing the algorithm expected. Optian: "RRT", "RRT*", "InformedRRT*". Anything else returns None
+                bounds 				( (float float float float) ): 	        x min, y min, x max and y max, coordinates fo the bounds of the configuration space.
+                pose_start			( (float float) ):  			Position of the initial point in configuration space, specified in problem.
+                pose_goal			( (float, float) ):			Position of the target point in configuration space, speciied in problem.
+                object_radius 			( float ):				Radius of objects.
+                steer_distance  		( float ):				Limit of the length of branch in tree.
+                num_iterations			( int ):				Max sample times for creating tree.
+                resolution			( int ):				Number of segments used to approximate a quarter circle arount point.
+                runForFullIterations	        ( boolean ):	        		If True RRT and RRTStar return the first path found without having to sample all num_iterations points. Default value = False.
+                RRT_Flavour			( string ):				String representing the algorithm expected. Optian: "RRT", "RRT*", "InformedRRT*". Anything else returns None
 
         Returns:
-                path 					( list<float, float> ):			A list of tuple/coordinates representing the nodes in path connecting start point and goal region
-                self.tree 				( list<Node> ):					A list of nodes in the tree
+                path 				( list<float, float> ):			A list of tuple/coordinates representing the nodes in path connecting start point and goal region
+                vertex 			        ( set<Node> ):				A list of nodes in the tree
         """
         time_start = rospy.get_rostime()
 
@@ -44,19 +44,19 @@ class SampleingBasedPathPlanner(object):
 
         Args:
                 environment 			(a yaml environment): 			Configuration space including obstacles.
-                bounds 					( (float float float float) ): 	x min, y min, x max and y max, coordinates fo the bounds of the configuration space.
-                pose_start				( (float float) ):  			Position of the initial point in configuration space, specified in problem.
-                pose_goal				( (float, float) ):				Position of the target point in configuration space, speciied in problem.
-                object_radius 			( float ):						Radius of objects.
-                steer_distance  		( float ):						Limit of the length of branch in tree.
-                num_iterations			( int ):						Max sample times for creating tree.
-                resolution				( int ):						Number of segments used to approximate a quarter circle arount point.
-                runForFullIterations	( boolean ):					If True RRT and RRTStar return the first path found without having to sample all num_iterations points. Default value = False.
-                RRT_Flavour				( string ):						String representing the algorithm expected. Optian: "RRT", "RRT*", "InformedRRT*". Anything else returns None
+                bounds 				( (float float float float) ): 	        x min, y min, x max and y max, coordinates fo the bounds of the configuration space.
+                pose_start			( (float float) ):  			Position of the initial point in configuration space, specified in problem.
+                pose_goal			( (float, float) ):			Position of the target point in configuration space, speciied in problem.
+                object_radius 			( float ):				Radius of objects.
+                steer_distance  		( float ):				Limit of the length of branch in tree.
+                num_iterations			( int ):				Max sample times for creating tree.
+                resolution			( int ):				Number of segments used to approximate a quarter circle arount point.
+                runForFullIterations	        ( boolean ):				If True RRT and RRTStar return the first path found without having to sample all num_iterations points. Default value = False.
+                RRT_Flavour			( string ):				String representing the algorithm expected. Optian: "RRT", "RRT*", "InformedRRT*". Anything else returns None
 
         Returns:
-                path 					( list<float, float> ):			A list of tuple/coordinates representing the nodes in path connecting start point and goal region
-                tree 					( list<Node> ):					A list of nodes in the tree
+                path 				( list<float, float> ):			A list of tuple/coordinates representing the nodes in path connecting start point and goal region
+                vertex 				( set<Node> ):				A list of nodes in the tree
         """
         time_start = rospy.get_rostime()
 

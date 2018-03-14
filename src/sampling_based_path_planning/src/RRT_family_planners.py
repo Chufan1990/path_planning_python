@@ -74,7 +74,7 @@ class RRTFamilyPathPlanner(object):
 			RRT_Flavour				( string ):						String representing the algorithm expected. Optian: "RRT", "RRT*", "InformedRRT*". Anything else returns None
 		
 		Returns:
-			path 					( list<float, float> ):			A list of tuple/coordinates representing the nodes in path connecting start point and goal region
+			self.path 				( list<float, float> ):			A list of tuple/coordinates representing the nodes in path connecting start point and goal region
 			self.vertex 			( set<Node> ):					A list of nodes in the tree
 		"""
 		
