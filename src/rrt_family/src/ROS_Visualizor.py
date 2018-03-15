@@ -79,6 +79,41 @@ class RRTFamilyVisualizer:
     def parser_region(self):
         self.plot_region(self.goal_region)
 
+    def parser_tree_v2(self, data):
+        tree = list()
+        for edge in data.edges:
+            tree.append(edge.child)
+            tree.append(edge.parent)
+            self.plot_tree_v2(tree)
+
+    def plot_tree_v2(self, tree):
+        marker = Marker()
+        marker.header.frame_id = 'path_planning'
+        marker.header.stamp = rospy.Time.now()
+        marker.ns = "path_planning"
+        marker.action = Marker.ADD
+        marker.lifetime = rospy.Duration(0.3)
+        marker.type = Marker.LINE_LIST
+        marker.id = 0
+        marker.scale.x = 0.01
+        marker.scale.y = 0.01
+        marker.scale.z = 0.01
+        marker.color.r = 110/255.0
+        marker.color.g = 110/255.0
+        marker.color.b = 110/255.0
+        marker.color.a = 1.0
+        marker.pose.orientation.x = 0
+        marker.pose.orientation.y = 0
+        marker.pose.orientation.z = 0
+        marker.pose.orientation.w = 1
+        for point in tree:
+            p = geometry_msgs.msg.Point()
+            p.x = point.x
+            p.y = point.y
+            p.z = 0.0
+            marker.points.append(p)
+        self.pub_tree.publish(marker) 
+
     def plot_tree(self, tree):
         marker = Marker()
         marker.header.frame_id = 'path_planning'

@@ -5,6 +5,7 @@ import math
 import numpy as np
 import rospy
 from geometry_msgs.msg import Point32
+from path_planning_msgs.msg import Point2D, Vertex, Edge, Edges
 
 class RRTFamilyPathPlanner(object):
 
@@ -54,8 +55,12 @@ class RRTFamilyPathPlanner(object):
 		self.steer_distance = steer_distance
 		self.vertex = set()
 		self.path = list()
+		self.tree = set()
 		# boolean
 		self.runForFullIterations = runForFullIterations
+		# publisher
+		self.pub_tree = rospy.Publisher("/path_planing/rrt_family/tree", Edges, queue_size=1)
+		self.rate = rospy.Rate(10)
 
 	def update(self, environment, bounds, pose_start, pose_goal, object_radius, steer_distance, num_iteration, resolution, runForFullIterations, RRT_Flavour):
 		""" Returns path connecting start point to goal region in the configuration space using specified RRT-variant algorithm
@@ -85,11 +90,13 @@ class RRTFamilyPathPlanner(object):
 			self.vertex.add(node_start)
 			self.vertex.add(node_goal)
 			self.path.append(node_start.point, node_goal.point)
+			self.tree = set(self.edge(node_goal.point, node_goal.parent.point))
 		elif self.isEdgeCollisionFree(node_start.point, node_goal.point):
 			node_goal.parent = node_start
 			self.vertex.add(node_start)
 			self.vertex.add(node_goal)
 			self.path.append(node_start.point, node_goal.point)
+			self.tree = set(self.edge(node_goal.point, node_goal.parent.point))
 		else:
 			if RRT_Flavour == "RRT":
 				self.path, self.vertex = self.RRTSearch()
@@ -134,6 +141,7 @@ class RRTFamilyPathPlanner(object):
 				###
 
 				self.vertex.add(node_new)
+				self.tree.add(self.edge(node_new.point, node_new.parent.point))
 				### For RRT*
 				# self.rewire()
 				###
@@ -184,7 +192,10 @@ class RRTFamilyPathPlanner(object):
 				# node_new = Node(point_new, node_nearest)  # delete if RRT*
 				###########
 				self.vertex.add(node_new)
+				self.tree.add(self.edge(node_new.point, node_new.parent.point))
 				self.rewire(set_nearest, node_new, node_min)
+				self.pub_tree.publish(Edges(list(self.tree)))
+				self.rate.sleep()
 				if self.isAtGoalRegion(point_new):
 					if not self.runForFullIterations:
 						path, __ = self.find_path(node_new, node_start)
@@ -346,6 +357,16 @@ class RRTFamilyPathPlanner(object):
 					self.vertex.discard(node)
 					node_rewired = Node(node.point, node_new)
 					self.vertex.add(node_rewired)
+					for edge in self.tree:
+						if edge == self.edge(node.point, node.parent.point):
+							self.tree.discard(edge)
+							self.tree.add(self.edge(node_rewired.point, node_rewired.parent.point))
+
+	def edge(self, point_from, point_to):
+		point_child = Point2D(point_from[0], point_from[1])
+		point_parent = Point2D(point_to[0], point_to[1])
+		edge = Edge(point_child, point_parent)
+		return edge
 
 class Node(object):
 	""" 
